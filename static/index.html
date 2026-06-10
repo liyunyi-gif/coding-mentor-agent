@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 课程学伴</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <!-- marked.js for Markdown rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Python 课程学伴</h1>
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="chat">聊天</button>
+                <button class="tab-btn" data-tab="diagnostic">诊断</button>
+                <button class="tab-btn" data-tab="practice">练习</button>
+                <button class="tab-btn" data-tab="progress">进度</button>
+            </nav>
+            <div class="session-info">
+                <span id="session-id-display">未连接</span>
+            </div>
+        </header>
+
+        <!-- Chat Panel -->
+        <main id="chat-panel" class="panel active">
+            <div id="chat-messages" class="chat-messages"></div>
+            <div class="chat-input-area">
+                <div class="code-editor-container">
+                    <textarea id="code-editor" placeholder="# 在此编写 Python 代码..."></textarea>
+                </div>
+                <div class="input-row">
+                    <input type="text" id="chat-input" placeholder="输入消息，询问 Python 问题..." />
+                    <button id="send-btn" class="btn-primary">发送</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Diagnostic Panel -->
+        <main id="diagnostic-panel" class="panel">
+            <div class="panel-content">
+                <h2>诊断测评</h2>
+                <p class="desc">完成诊断题，系统将评估你的 Python 水平并推荐学习起点。</p>
+                <div id="diagnostic-area">
+                    <div id="diagnostic-question" class="question-card"></div>
+                    <div id="diagnostic-feedback" class="feedback-area"></div>
+                </div>
+                <button id="start-diagnostic-btn" class="btn-primary">开始诊断</button>
+            </div>
+        </main>
+
+        <!-- Practice Panel -->
+        <main id="practice-panel" class="panel">
+            <div class="panel-content">
+                <h2>练习</h2>
+                <p class="desc">完成诊断后可解锁练习。</p>
+                <div id="practice-status" class="status-card">请先完成诊断测评</div>
+                <div id="practice-exercise" class="exercise-card" style="display:none">
+                    <h3 id="exercise-title"></h3>
+                    <div id="exercise-prompt" class="markdown-body"></div>
+                    <div id="exercise-checklist"></div>
+                </div>
+                <button id="request-practice-btn" class="btn-primary" style="display:none">请求练习</button>
+            </div>
+        </main>
+
+        <!-- Progress Panel -->
+        <main id="progress-panel" class="panel">
+            <div class="panel-content">
+                <h2>学习进度</h2>
+                <div id="progress-content">
+                    <div class="progress-section">
+                        <h3>基本概况</h3>
+                        <div id="profile-info"></div>
+                    </div>
+                    <div class="progress-section">
+                        <h3>概念掌握</h3>
+                        <div id="mastery-list"></div>
+                    </div>
+                    <div class="progress-section">
+                        <h3>薄弱环节</h3>
+                        <div id="weak-list"></div>
+                    </div>
+                    <div class="progress-section">
+                        <h3>课程进度</h3>
+                        <div id="curriculum-progress"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/chat.js"></script>
+    <script src="/static/js/diagnostic.js"></script>
+    <script src="/static/js/practice.js"></script>
+    <script src="/static/js/progress.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
