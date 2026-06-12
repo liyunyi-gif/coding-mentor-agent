@@ -96,16 +96,28 @@ def create_app() -> FastAPI:
             rt.db.execute(f"DELETE FROM {table}").run()
         return {"message": "学习数据已清除"}
 
-    # Serve static frontend
-    static_dir = Path(__file__).parent.parent / "static"
-    if static_dir.exists():
-        # Mount assets (CSS, JS) under /static path
-        app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+    # Serve static frontend (Vue SPA built by Vite)
+    front_dist = Path(__file__).parent.parent / "front" / "dist"
+    if front_dist.exists():
+        # Mount Vite output assets (JS, CSS) under /assets
+        assets_dir = front_dist / "assets"
+        if assets_dir.exists():
+            app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
         # Serve index.html at root
         @app.get("/")
         async def serve_index():
-            return FileResponse(str(static_dir / "index.html"))
+            return FileResponse(str(front_dist / "index.html"))
+
+    # Fallback: also check old static/ directory
+    static_dir = Path(__file__).parent.parent / "static"
+    if static_dir.exists():
+        app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+        if not front_dist.exists():
+            @app.get("/")
+            async def serve_index_legacy():
+                return FileResponse(str(static_dir / "index.html"))
 
     return app
 
