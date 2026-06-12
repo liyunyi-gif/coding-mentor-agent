@@ -59,7 +59,7 @@ loadQuestion()
 </script>
 
 <template>
-  <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
+  <div class="flex-1 min-h-0 overflow-y-auto p-6 bg-gray-50">
     <div class="w-full">
       <h2 class="text-lg font-semibold text-gray-800 mb-1">诊断测评</h2>
       <p class="text-sm text-gray-500 mb-4">完成诊断题，系统将评估你的 Python 水平。</p>

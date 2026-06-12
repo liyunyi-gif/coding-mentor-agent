@@ -79,7 +79,7 @@ async function handleSend() {
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-white">
+  <div class="flex flex-col flex-1 min-h-0 bg-white">
     <MessageList :messages="store.messages" />
     <div class="px-4 py-3 border-t border-gray-100 bg-white">
       <div v-if="showCode" class="mb-2">
