@@ -88,13 +88,13 @@ defineExpose({ loadSessions })
       >
         <MessageSquare :size="14" class="shrink-0 text-gray-400" />
         <span class="truncate flex-1">{{ store.getSessionName(s.id) }}</span>
-        <span class="text-xs text-gray-400 shrink-0 hidden group-hover:hidden">{{ formatDate(s.started_at) }}</span>
+        <span class="text-xs text-gray-400 shrink-0">{{ formatDate(s.started_at) }}</span>
         <button
           @click="(e) => handleDelete(e, s.id)"
-          class="shrink-0 p-0.5 rounded text-gray-300 hover:text-gray-500 hover:bg-gray-200 transition-colors hidden group-hover:block"
+          class="shrink-0 p-1 rounded-full bg-gray-200 text-gray-400 hover:bg-gray-300 hover:text-gray-600 transition-colors ml-1"
           title="删除"
         >
-          <X :size="14" />
+          <X :size="12" />
         </button>
       </div>
     </div>
