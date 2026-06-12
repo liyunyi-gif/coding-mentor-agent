@@ -38,7 +38,7 @@ function handleSelectSession(id: string) {
         :sidebar-collapsed="sidebarCollapsed"
         @toggle-sidebar="sidebarCollapsed = !sidebarCollapsed"
       />
-      <main class="flex-1 overflow-hidden bg-gray-50">
+      <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
         <router-view />
       </main>
     </div>
