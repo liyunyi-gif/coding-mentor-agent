@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Plus, MessageSquare, Trash2 } from 'lucide-vue'
+import { Plus, MessageSquare, X } from 'lucide-vue'
 import { exportData } from '@/api/data'
 import { deleteSession } from '@/api/sessions'
 import { useSessionStore } from '@/stores/session'
@@ -91,10 +91,10 @@ defineExpose({ loadSessions })
         <span class="text-xs text-gray-400 shrink-0 hidden group-hover:hidden">{{ formatDate(s.started_at) }}</span>
         <button
           @click="(e) => handleDelete(e, s.id)"
-          class="shrink-0 p-0.5 rounded hover:bg-red-100 text-gray-400 hover:text-red-500 transition-colors hidden group-hover:block"
-          title="删除对话"
+          class="shrink-0 p-0.5 rounded text-gray-300 hover:text-gray-500 hover:bg-gray-200 transition-colors hidden group-hover:block"
+          title="删除"
         >
-          <Trash2 :size="14" />
+          <X :size="14" />
         </button>
       </div>
     </div>

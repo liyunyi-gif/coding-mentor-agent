@@ -43,6 +43,5 @@ const activeTab = computed(() => {
         {{ t.label }}
       </button>
     </nav>
-    <span class="ml-auto text-xs text-gray-400">{{ store.sessionDisplay }}</span>
   </header>
 </template>
