@@ -5,7 +5,6 @@ import CodeEditor from './CodeEditor.vue'
 import MessageList from './MessageList.vue'
 import { ArrowUp, Code2, MessageCircle } from 'lucide-vue'
 import { sendMessage } from '@/api/messages'
-import { apiCall } from '@/api/client'
 
 const store = useSessionStore()
 const input = ref('')
