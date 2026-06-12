@@ -99,21 +99,29 @@ export const useSessionStore = defineStore('session', () => {
     } catch { /* session may be empty */ }
   }
 
+  function removeSessionName(id: string) {
+    const names = loadNames()
+    delete names[id]
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(names))
+  }
+
   function clearMessages() {
     messages.value = []
   }
 
-  function newChat() {
+  async function newChat() {
     sessionId.value = null
     messages.value = []
     msgCounter = 0
-    return initSession()
+    const sid = await initSession()
+    saveName(sid, '新对话')
+    return sid
   }
 
   return {
     sessionId, messages, isLoading, error,
     hasSession, sessionDisplay,
     initSession, sendMessage, addMessage, loadSession, clearMessages, newChat,
-    getSessionName,
+    getSessionName, removeSessionName,
   }
 })

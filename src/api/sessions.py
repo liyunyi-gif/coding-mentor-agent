@@ -93,3 +93,41 @@ def get_session_snapshot(request: Request, session_id: str):
         "active_exercise": None,
         "active_practice_contract": None,
     }
+
+
+@router.delete("/api/sessions/{session_id}")
+def delete_session(request: Request, session_id: str):
+    """Physically delete a session and all related data."""
+    runtime = _get_runtime(request)
+    session = runtime.db.execute(
+        "SELECT id FROM agent_sessions WHERE id = ?", (session_id,)
+    ).get()
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # Delete all related data in dependency order
+    # Tables with session_id directly
+    for table in [
+        "session_sse_events", "session_messages",
+        "intent_routes", "tool_evidence",
+        "practice_submissions", "practice_contracts",
+        "learning_events", "concept_mastery",
+        "session_turns",
+    ]:
+        runtime.db.execute(f"DELETE FROM {table} WHERE session_id = ?").run([session_id])
+
+    # Tables linked via diagnostic_session_id (join through diagnostic_sessions)
+    diag_ids = runtime.db.execute(
+        "SELECT id FROM diagnostic_sessions WHERE session_id = ?", [session_id]
+    ).all()
+    for row in diag_ids:
+        runtime.db.execute("DELETE FROM diagnostic_answers WHERE diagnostic_session_id = ?").run([row["id"]])
+        runtime.db.execute("DELETE FROM diagnostic_concept_state WHERE diagnostic_session_id = ?").run([row["id"]])
+
+    # Delete diagnostic_sessions themselves
+    runtime.db.execute("DELETE FROM diagnostic_sessions WHERE session_id = ?").run([session_id])
+
+    # Delete the session itself
+    runtime.db.execute("DELETE FROM agent_sessions WHERE id = ?").run([session_id])
+
+    return {"message": f"Session {session_id} deleted", "ok": True}

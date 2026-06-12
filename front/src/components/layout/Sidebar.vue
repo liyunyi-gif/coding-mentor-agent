@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Plus, MessageSquare, PanelLeftClose } from 'lucide-vue'
+import { Plus, MessageSquare, Trash2 } from 'lucide-vue'
 import { exportData } from '@/api/data'
+import { deleteSession } from '@/api/sessions'
 import { useSessionStore } from '@/stores/session'
 
 interface SessionInfo { id: string; status: string; started_at: string }
@@ -24,18 +25,31 @@ function formatDate(iso: string) {
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-function handleNewChat() {
-  store.newChat().then(() => {
-    emit('selectSession', store.sessionId!)
-    loadSessions()
-  })
+async function handleNewChat() {
+  await store.newChat()
+  await loadSessions()
+  emit('selectSession', store.sessionId!)
 }
 
 function handleSelect(id: string) {
   store.loadSession(id).then(() => {
     emit('selectSession', id)
-    loadSessions()
   })
+}
+
+async function handleDelete(e: Event, id: string) {
+  e.stopPropagation()
+  if (!confirm('确认删除此对话？所有消息将被永久删除。')) return
+  try {
+    await deleteSession(id)
+    store.removeSessionName(id)
+    // If deleting current session, clear
+    if (store.sessionId === id) {
+      store.clearMessages()
+      store.sessionId = null
+    }
+    await loadSessions()
+  } catch { /* ignore */ }
 }
 
 onMounted(loadSessions)
@@ -62,20 +76,27 @@ defineExpose({ loadSessions })
     <div class="flex-1 overflow-y-auto px-2 pb-2">
       <p class="px-2 py-1 text-xs text-gray-400 font-medium">历史对话</p>
       <div v-if="sessions.length === 0" class="px-2 py-3 text-xs text-gray-400">暂无</div>
-      <button
+      <div
         v-for="s in sessions" :key="s.id"
         @click="handleSelect(s.id)"
         :class="[
-          'flex items-center gap-2 w-full px-3 py-2 text-left text-sm rounded-lg transition-colors truncate',
+          'group flex items-center gap-2 w-full px-3 py-2 text-left text-sm rounded-lg transition-colors cursor-pointer',
           store.sessionId === s.id
             ? 'bg-gray-200 text-gray-900 font-medium'
             : 'text-gray-600 hover:bg-gray-200/70',
         ]"
       >
         <MessageSquare :size="14" class="shrink-0 text-gray-400" />
-        <span class="truncate">{{ store.getSessionName(s.id) }}</span>
-        <span class="text-xs text-gray-400 ml-auto shrink-0">{{ formatDate(s.started_at) }}</span>
-      </button>
+        <span class="truncate flex-1">{{ store.getSessionName(s.id) }}</span>
+        <span class="text-xs text-gray-400 shrink-0 hidden group-hover:hidden">{{ formatDate(s.started_at) }}</span>
+        <button
+          @click="(e) => handleDelete(e, s.id)"
+          class="shrink-0 p-0.5 rounded hover:bg-red-100 text-gray-400 hover:text-red-500 transition-colors hidden group-hover:block"
+          title="删除对话"
+        >
+          <Trash2 :size="14" />
+        </button>
+      </div>
     </div>
   </aside>
 </template>

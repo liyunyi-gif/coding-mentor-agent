@@ -43,7 +43,7 @@ onMounted(checkAvailability)
 
 <template>
   <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
-    <div class="max-w-2xl mx-auto">
+    <div class="w-full">
       <h2 class="text-lg font-semibold text-gray-800 mb-1">练习</h2>
       <p class="text-sm text-gray-500 mb-4">完成诊断后可解锁编程练习。</p>
 

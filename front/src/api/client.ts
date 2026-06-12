@@ -48,3 +48,7 @@ export function get<T = unknown>(url: string, timeoutMs?: number): Promise<T> {
 export function post<T = unknown>(url: string, body: unknown, timeoutMs?: number): Promise<T> {
   return apiCall<T>(url, { method: 'POST', body: JSON.stringify(body) }, timeoutMs)
 }
+
+export function del<T = unknown>(url: string, timeoutMs?: number): Promise<T> {
+  return apiCall<T>(url, { method: 'DELETE' }, timeoutMs)
+}
