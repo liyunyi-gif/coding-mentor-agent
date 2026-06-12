@@ -3,7 +3,6 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
 import { python } from '@codemirror/lang-python'
-import { oneDark } from '@codemirror/theme-one-dark'
 import { defaultKeymap } from '@codemirror/commands'
 
 const props = defineProps<{ modelValue?: string }>()
@@ -28,12 +27,16 @@ onMounted(() => {
       highlightActiveLine(),
       keymap.of(defaultKeymap),
       python(),
-      oneDark,
       updateListener,
       EditorState.tabSize.of(4),
       EditorView.theme({
-        '&': { height: '120px' },
-        '.cm-scroller': { overflow: 'auto' },
+        '&': { height: '120px', backgroundColor: '#fafafa', borderRadius: '6px', border: '1px solid #e5e7eb' },
+        '.cm-scroller': { overflow: 'auto', fontFamily: "'Fira Code', 'Consolas', monospace", fontSize: '13px' },
+        '.cm-gutters': { backgroundColor: '#f3f4f6', color: '#9ca3af', borderRight: '1px solid #e5e7eb' },
+        '.cm-activeLineGutter': { backgroundColor: '#e5e7eb' },
+        '.cm-activeLine': { backgroundColor: '#f3f4f6' },
+        '.cm-cursor': { borderLeftColor: '#374151' },
+        '.cm-selectionBackground': { backgroundColor: '#bfdbfe !important' },
       }),
     ],
     parent: editorRef.value,
@@ -65,7 +68,5 @@ defineExpose({ clear })
 </script>
 
 <template>
-  <div class="border border-brand-border rounded overflow-hidden mb-2">
-    <div ref="editorRef" class="cm-editor-container"></div>
-  </div>
+  <div ref="editorRef"></div>
 </template>

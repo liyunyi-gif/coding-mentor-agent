@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
 import { computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
-import { Code, Stethoscope, Dumbbell, ChartBar } from 'lucide-vue'
+import { Code, Stethoscope, Dumbbell, ChartBar, PanelLeft } from 'lucide-vue'
+
+defineProps<{ sidebarCollapsed: boolean }>()
+const emit = defineEmits<{ 'toggleSidebar': [] }>()
 
 const router = useRouter()
 const route = useRoute()
@@ -16,37 +19,30 @@ const tabs = [
 ]
 
 const activeTab = computed(() => {
-  const path = route.path
-  for (const tab of tabs) {
-    if (path.startsWith('/' + tab.name)) return tab.name
-  }
+  const p = route.path
+  for (const t of tabs) if (p.startsWith('/' + t.name)) return t.name
   return 'chat'
 })
-
-function goTab(tab: typeof tabs[0]) {
-  router.push(tab.route)
-}
 </script>
 
 <template>
-  <header class="flex items-center gap-4 px-5 py-3 bg-brand-panel border-b border-brand-border">
-    <h1 class="text-lg font-semibold text-brand-blue whitespace-nowrap">Python 课程学伴</h1>
-    <nav class="flex gap-1">
+  <header class="flex items-center gap-3 px-4 py-2.5 bg-white border-b border-gray-200 shrink-0">
+    <button @click="emit('toggleSidebar')" class="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 transition-colors" title="侧栏">
+      <PanelLeft :size="18" />
+    </button>
+    <h1 class="text-base font-semibold text-gray-800 whitespace-nowrap">Python 学伴</h1>
+    <nav class="flex gap-0.5 ml-2">
       <button
-        v-for="tab in tabs"
-        :key="tab.name"
-        @click="goTab(tab)"
+        v-for="t in tabs" :key="t.name" @click="router.push(t.route)"
         :class="[
-          'flex items-center gap-1.5 px-3 py-1.5 rounded text-sm border transition-colors',
-          activeTab === tab.name
-            ? 'bg-brand-dark text-brand-blue border-brand-blue'
-            : 'bg-transparent text-gray-500 border-brand-border hover:bg-brand-dark hover:text-gray-300',
+          'flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors',
+          activeTab === t.name ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50',
         ]"
       >
-        <component :is="tab.icon" :size="14" />
-        {{ tab.label }}
+        <component :is="t.icon" :size="14" />
+        {{ t.label }}
       </button>
     </nav>
-    <span class="ml-auto text-xs text-gray-600">{{ store.sessionDisplay }}</span>
+    <span class="ml-auto text-xs text-gray-400">{{ store.sessionDisplay }}</span>
   </header>
 </template>

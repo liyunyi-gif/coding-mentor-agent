@@ -1,17 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-
 const props = defineProps<{ level: number }>()
-
-const color = computed(() => {
-  if (props.level >= 80) return 'bg-green-500'
-  if (props.level >= 50) return 'bg-orange-500'
-  return 'bg-red-500'
-})
+const color = computed(() => props.level >= 80 ? 'bg-green-500' : props.level >= 50 ? 'bg-orange-400' : 'bg-red-500')
 </script>
-
 <template>
-  <div class="w-28 h-2 bg-brand-border rounded-full overflow-hidden">
+  <div class="w-28 h-2 bg-gray-100 rounded-full overflow-hidden">
     <div :class="[color, 'h-full rounded-full transition-all']" :style="{ width: `${level}%` }"></div>
   </div>
 </template>
