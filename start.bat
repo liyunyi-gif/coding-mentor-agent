@@ -1,36 +1,22 @@
 @echo off
 chcp 65001 >nul
-cd /d "%~dp0"
 
-echo ========================================
-echo   Coding Mentor Agent - Python 课程学伴
-echo ========================================
-echo.
+set "PROJECT_ROOT=%~dp0"
+cd /d "%PROJECT_ROOT%"
+set "PYTHONPATH=%PROJECT_ROOT%;%PYTHONPATH%"
 
-REM 检查 .env 是否存在
-if not exist ".env" (
-    echo [WARN] 未找到 .env 文件，请先复制 .env.example 并填入配置
-    echo   copy .env.example .env
-    echo.
+if not exist "%PROJECT_ROOT%.env" (
+    echo [WARN] .env 文件不存在，请先复制 .env.example 并填入配置
 )
 
-REM 检查依赖
 python -c "import fastapi" 2>nul
 if %errorlevel% neq 0 (
-    echo [INFO] 正在安装依赖...
-    pip install -r requirements.txt
+    pip install -r "%PROJECT_ROOT%requirements.txt"
     if %errorlevel% neq 0 (
-        echo [ERROR] 依赖安装失败
         pause
         exit /b 1
     )
-    echo.
 )
 
-echo [INFO] 启动服务器 http://127.0.0.1:8080
-echo [INFO] 按 Ctrl+C 停止
-echo.
-
+start http://127.0.0.1:8080
 python -m uvicorn src.main:app --host 127.0.0.1 --port 8080
-
-pause

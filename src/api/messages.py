@@ -18,7 +18,7 @@ def _append_sse_event(runtime: AppRuntime, session_id: str, turn_id: str, event_
         (session_id,),
     ).get()
     next_seq = next_seq_row["seq"] if next_seq_row else 1
-    event_id = f"evt_{str(next_seq).zfill(6)}"
+    event_id = _make_id("evt")
 
     runtime.db.execute(
         """INSERT INTO session_sse_events(id, session_id, turn_id, seq, event_type, payload_json, created_at)
