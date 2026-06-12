@@ -1,8 +1,19 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { createSession } from '@/api/sessions'
+import { createSession, getSessionSnapshot } from '@/api/sessions'
 import { sendMessage as apiSendMessage } from '@/api/messages'
 import type { ChatMessage } from '@/types/api'
+
+const STORAGE_KEY = 'mentor_session_names'
+
+function loadNames(): Record<string, string> {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') } catch { return {} }
+}
+function saveName(id: string, name: string) {
+  const names = loadNames()
+  names[id] = name
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(names))
+}
 
 export const useSessionStore = defineStore('session', () => {
   const sessionId = ref<string | null>(null)
@@ -17,6 +28,10 @@ export const useSessionStore = defineStore('session', () => {
 
   let msgCounter = 0
 
+  function getSessionName(id: string): string {
+    return loadNames()[id] || '新对话'
+  }
+
   async function initSession(): Promise<string> {
     if (sessionId.value) return sessionId.value
     try {
@@ -26,6 +41,7 @@ export const useSessionStore = defineStore('session', () => {
     } catch {
       const data = await createSession(false)
       sessionId.value = data.session_id
+      saveName(data.session_id, '新对话')
       return data.session_id
     }
   }
@@ -37,6 +53,11 @@ export const useSessionStore = defineStore('session', () => {
       text,
       timestamp: Date.now(),
     })
+    // Save first user message as session name
+    if (role === 'user' && sessionId.value) {
+      const name = text.slice(0, 30) + (text.length > 30 ? '...' : '')
+      saveName(sessionId.value, name)
+    }
   }
 
   async function sendMessage(message: string, code?: string) {
@@ -48,15 +69,10 @@ export const useSessionStore = defineStore('session', () => {
     addMessage('user', displayText)
 
     try {
-      const body: { message: string; code?: string } = {
-        message: message || '请看这段代码',
-      }
+      const body: { message: string; code?: string } = { message: message || '请看这段代码' }
       if (code) body.code = code
-
       const data = await apiSendMessage(sid, body)
-      if (data.assistant_message) {
-        addMessage('assistant', data.assistant_message)
-      }
+      if (data.assistant_message) addMessage('assistant', data.assistant_message)
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : '未知错误'
       addMessage('error', `错误: ${errMsg}`)
@@ -66,20 +82,38 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
+  async function loadSession(id: string) {
+    sessionId.value = id
+    messages.value = []
+    msgCounter = 0
+    try {
+      const snap = await getSessionSnapshot(id)
+      for (const turn of snap.turns) {
+        if (turn.user_message?.text) {
+          addMessage('user', turn.user_message.text)
+        }
+        for (const am of turn.assistant_messages) {
+          if (am.text) addMessage('assistant', am.text)
+        }
+      }
+    } catch { /* session may be empty */ }
+  }
+
   function clearMessages() {
     messages.value = []
   }
 
+  function newChat() {
+    sessionId.value = null
+    messages.value = []
+    msgCounter = 0
+    return initSession()
+  }
+
   return {
-    sessionId,
-    messages,
-    isLoading,
-    error,
-    hasSession,
-    sessionDisplay,
-    initSession,
-    sendMessage,
-    addMessage,
-    clearMessages,
+    sessionId, messages, isLoading, error,
+    hasSession, sessionDisplay,
+    initSession, sendMessage, addMessage, loadSession, clearMessages, newChat,
+    getSessionName,
   }
 })

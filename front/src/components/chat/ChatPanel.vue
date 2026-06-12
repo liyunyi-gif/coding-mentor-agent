@@ -89,12 +89,14 @@ async function handleSend() {
         <button
           @click="showCode = !showCode"
           :class="[
-            'p-2 rounded-lg border transition-colors shrink-0',
-            showCode ? 'bg-gray-100 border-gray-300 text-gray-700' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50',
+            'flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-colors shrink-0 text-xs font-medium',
+            showCode ? 'bg-gray-100 border-gray-300 text-gray-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50',
           ]"
+          :title="showCode ? '切换到消息输入' : '切换到代码输入'"
         >
-          <Code2 v-if="!showCode" :size="16" />
-          <MessageCircle v-else :size="16" />
+          <component :is="showCode ? MessageCircle : Code2" :size="16" />
+          <span v-if="showCode">点击切换聊天框</span>
+          <span v-else>点击切换代码框</span>
         </button>
         <input
           v-model="input" :disabled="store.isLoading"
